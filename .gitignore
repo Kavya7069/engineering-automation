@@ -1,0 +1,56 @@
+# -----------------------------
+# Python / Backend
+# -----------------------------
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyd
+*.pdb
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dll
+
+# FastAPI / Uvicorn logs
+*.log
+
+# Environment variables file
+.env
+.env.*
+
+# Local development files
+*.sqlite3
+
+# VS Code settings
+.vscode/
+
+# -----------------------------
+# Node / Web (if you add npm later)
+# -----------------------------
+node_modules/
+dist/
+build/
+
+# -----------------------------
+# OS junk files
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Temporary files
+# -----------------------------
+*.tmp
+*.swp
+*.bak
+*.old
+
