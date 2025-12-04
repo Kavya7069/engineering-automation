@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Workflow Automation Tool</title>
+    <style>
+        :root {
+            --color-primary: #2180708d;
+            --color-primary-hover: #1d7480;
+            --color-primary-active: #1a6873;
+            --color-background: #fcfcf9;
+            --color-surface: #ffffff;
+            --color-text: #134252;
+            --color-text-secondary: #626c71;
+            --color-border: #5e5240;
+            --color-success: #208d8d;
+            --color-error: #c0152f;
+            --color-warning: #a84b2f;
+            --color-info: #626c71;
+            --radius-base: 8px;
+            --space-8: 8px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-background);
+            color: var(--color-text);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #208d8d 0%, #1d7480 100%);
+            color: white;
+            padding: var(--space-24);
+            box-shadow: var(--shadow-md);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: var(--space-8) 0 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-24);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-24);
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--color-surface);
+            border-radius: var(--radius-base);
+            border: 1px solid rgba(94, 82, 64, 0.2);
+            box-shadow: var(--shadow-sm);
+            padding: var(--space-20);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card h2 {
+            margin: 0 0 var(--space-16) 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .card p {
+            margin: 0 0 var(--space-16) 0;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-16);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--space-8) var(--space-12);
+            font-size: 14px;
+            border: 1px solid rgba(94, 82, 64, 0.2);
+            border-radius: var(--radius-base);
+            background-color: var(--color-surface);
+            color: var(--color-text);
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.2);
+        }
+
+        textarea.form-control {
+            font-family: monospace;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-8) var(--space-16);
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-primary:active {
+            background: var(--color-primary-active);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(94, 82, 64, 0.12);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(94, 82, 64, 0.2);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: var(--space-4) var(--space-12);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: rgba(32, 141, 141, 0.15);
+            color: var(--color-success);
+            border: 1px solid rgba(32, 141, 141, 0.25);
+        }
+
+        .status-error {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-error);
+            border: 1px solid rgba(192, 21, 47, 0.25);
+        }
+
+        .status-pending {
+            background: rgba(168, 75, 47, 0.15);
+            color: var(--color-warning);
+            border: 1px solid rgba(168, 75, 47, 0.25);
+        }
+
+        .status-info {
+            background: rgba(98, 108, 113, 0.15);
+            color: var(--color-info);
+            border: 1px solid rgba(98, 108, 113, 0.25);
+        }
+
+        .workflow-item {
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            background: rgba(33, 128, 141, 0.08);
+            margin-bottom: var(--space-16);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .workflow-item:hover {
+            background: rgba(33, 128, 141, 0.15);
+        }
+
+        .workflow-item h3 {
+            margin: 0 0 var(--space-8) 0;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .workflow-item p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .output-box {
+            background: #f5f5f5;
+            border: 1px solid rgba(94, 82, 64, 0.15);
+            border-radius: var(--radius-base);
+            padding: var(--space-16);
+            margin-top: var(--space-16);
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: var(--space-8);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(192, 21, 47, 0.1);
+            border-left: 3px solid var(--color-error);
+            padding: var(--space-12);
+            border-radius: 4px;
+            margin: var(--space-16) 0;
+            font-size: 13px;
+            color: var(--color-error);
+        }
+
+        .success-message {
+            background: rgba(32, 141, 141, 0.1);
+            border-left: 3px solid var(--color-success);
+            padding: var(--space-12);
+            border-radius: 4px;
+            margin: var(--space-16) 0;
+            font-size: 13px;
+            color: var(--color-success);
+        }
+
+        .tabs {
+            display: flex;
+            gap: var(--space-8);
+            border-bottom: 1px solid rgba(94, 82, 64, 0.2);
+            margin-bottom: var(--space-16);
+        }
+
+        .tab-btn {
+            padding: var(--space-12) var(--space-16);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 Engineering Workflow Automation</h1>
+        <p>Streamline your engineering processes with automated workflows</p>
+    </div>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Left: Workflow Selection -->
+            <div class="card">
+                <h2>Available Workflows</h2>
+                <p>Select a workflow to begin automating your engineering tasks</p>
+                
+                <div id="workflowList">
+                    <div class="workflow-item" onclick="selectWorkflow('csv_processing')">
+                        <h3>📊 CSV Data Processing</h3>
+                        <p>Upload and validate CSV files, perform calculations</p>
+                    </div>
+                    <div class="workflow-item" onclick="selectWorkflow('file_conversion')">
+                        <h3>🔄 File Conversion</h3>
+                        <p>Convert and transform data between formats</p>
+                    </div>
+                    <div class="workflow-item" onclick="selectWorkflow('api_integration')">
+                        <h3>🔗 API Integration</h3>
+                        <p>Fetch and process data from external APIs</p>
+                    </div>
+                    <div class="workflow-item" onclick="selectWorkflow('report_generation')">
+                        <h3>📄 Report Generation</h3>
+                        <p>Generate formatted reports from processed data</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Workflow Execution -->
+            <div class="card">
+                <h2>Workflow Execution</h2>
+                
+                <div id="noWorkflowSelected" style="text-align: center; padding: var(--space-32) 0; color: var(--color-text-secondary);">
+                    <p>👈 Select a workflow from the left panel to get started</p>
+                </div>
+
+                <div id="workflowForm" class="hidden">
+                    <!-- CSV Processing Form -->
+                    <div id="csv_processing_form" class="tab-content active">
+                        <div class="form-group">
+                            <label class="form-label">Upload CSV File</label>
+                            <input type="file" id="csvFile" class="form-control" accept=".csv" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Operation</label>
+                            <select id="csvOperation" class="form-control">
+                                <option value="validate">Validate Data</option>
+                                <option value="summary">Generate Summary</option>
+                                <option value="transform">Transform Data</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="executeWorkflow('csv_processing')">
+                            Execute Workflow
+                        </button>
+                    </div>
+
+                    <!-- File Conversion Form -->
+                    <div id="file_conversion_form" class="tab-content">
+                        <div class="form-group">
+                            <label class="form-label">Source Format</label>
+                            <select id="sourceFormat" class="form-control">
+                                <option value="json">JSON</option>
+                                <option value="xml">XML</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Format</label>
+                            <select id="targetFormat" class="form-control">
+                                <option value="json">JSON</option>
+                                <option value="xml">XML</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Input</label>
+                            <textarea id="conversionData" class="form-control" placeholder="Paste your data here..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="executeWorkflow('file_conversion')">
+                            Convert Format
+                        </button>
+                    </div>
+
+                    <!-- API Integration Form -->
+                    <div id="api_integration_form" class="tab-content">
+                        <div class="form-group">
+                            <label class="form-label">API Endpoint</label>
+                            <input type="text" id="apiEndpoint" class="form-control" placeholder="e.g., https://api.example.com/data" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Request Method</label>
+                            <select id="apiMethod" class="form-control">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Query Parameters</label>
+                            <textarea id="apiParams" class="form-control" placeholder="JSON format..." rows="4"></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="executeWorkflow('api_integration')">
+                            Call API
+                        </button>
+                    </div>
+
+                    <!-- Report Generation Form -->
+                    <div id="report_generation_form" class="tab-content">
+                        <div class="form-group">
+                            <label class="form-label">Report Title</label>
+                            <input type="text" id="reportTitle" class="form-control" placeholder="Enter report title..." />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Report Data</label>
+                            <textarea id="reportData" class="form-control" placeholder="Paste JSON data..." rows="6"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Report Format</label>
+                            <select id="reportFormat" class="form-control">
+                                <option value="html">HTML</option>
+                                <option value="json">JSON</option>
+                                <option value="markdown">Markdown</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="executeWorkflow('report_generation')">
+                            Generate Report
+                        </button>
+                    </div>
+
+                    <div id="workflowOutput" class="hidden">
+                        <h3 style="margin-top: var(--space-24); margin-bottom: var(--space-12);">Output</h3>
+                        <div id="statusMessage" class="hidden"></div>
+                        <div id="outputContent" class="output-box"></div>
+                        <button class="btn btn-secondary" onclick="clearOutput()" style="margin-top: var(--space-16);">
+                            Clear Output
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Execution History -->
+        <div class="card" style="margin-top: var(--space-24);">
+            <h2>Execution History</h2>
+            <div id="executionHistory" style="max-height: 300px; overflow-y: auto;">
+                <p style="color: var(--color-text-secondary); font-size: 13px;">No workflows executed yet</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentWorkflow = null;
+        let executionHistory = [];
+
+        const API_BASE = 'http://localhost:8000/api';
+
+        function selectWorkflow(workflowType) {
+            currentWorkflow = workflowType;
+            document.getElementById('noWorkflowSelected').classList.add('hidden');
+            document.getElementById('workflowForm').classList.remove('hidden');
+            
+            // Show relevant form
+            document.querySelectorAll('[id$="_form"]').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(`${workflowType}_form`).classList.add('active');
+        }
+
+        async function executeWorkflow(workflowType) {
+            const button = event.target;
+            button.disabled = true;
+            
+            let payload = {};
+            let endpoint = '';
+
+            try {
+                switch(workflowType) {
+                    case 'csv_processing':
+                        const fileInput = document.getElementById('csvFile');
+                        if (!fileInput.files.length) {
+                            showError('Please select a CSV file');
+                            button.disabled = false;
+                            return;
+                        }
+                        endpoint = '/workflows/csv-processing';
+                        const formData = new FormData();
+                        formData.append('file', fileInput.files[0]);
+                        formData.append('operation', document.getElementById('csvOperation').value);
+                        payload = formData;
+                        break;
+
+                    case 'file_conversion':
+                        endpoint = '/workflows/file-conversion';
+                        payload = {
+                            source_format: document.getElementById('sourceFormat').value,
+                            target_format: document.getElementById('targetFormat').value,
+                            data: document.getElementById('conversionData').value
+                        };
+                        break;
+
+                    case 'api_integration':
+                        endpoint = '/workflows/api-integration';
+                        payload = {
+                            endpoint: document.getElementById('apiEndpoint').value,
+                            method: document.getElementById('apiMethod').value,
+                            params: JSON.parse(document.getElementById('apiParams').value || '{}')
+                        };
+                        break;
+
+                    case 'report_generation':
+                        endpoint = '/workflows/report-generation';
+                        payload = {
+                            title: document.getElementById('reportTitle').value,
+                            data: JSON.parse(document.getElementById('reportData').value || '{}'),
+                            format: document.getElementById('reportFormat').value
+                        };
+                        break;
+                }
+
+                showLoading(button);
+                const url = `${API_BASE}${endpoint}`;
+                const options = {
+                    method: 'POST',
+                    headers: payload instanceof FormData ? {} : { 'Content-Type': 'application/json' },
+                    body: payload instanceof FormData ? payload : JSON.stringify(payload)
+                };
+
+                const response = await fetch(url, options);
+                const result = await response.json();
+
+                if (response.ok) {
+                    displayOutput(result, 'success');
+                    addToHistory(workflowType, 'completed', result);
+                } else {
+                    showError(result.detail || 'Workflow execution failed');
+                    addToHistory(workflowType, 'failed', result);
+                }
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+                addToHistory(workflowType, 'error', { error: error.message });
+            } finally {
+                button.disabled = false;
+                button.innerHTML = 'Execute Workflow';
+            }
+        }
+
+        function showLoading(button) {
+            button.innerHTML = '<div class="loading-spinner"></div>Processing...';
+            button.disabled = true;
+        }
+
+        function displayOutput(data, status) {
+            document.getElementById('workflowOutput').classList.remove('hidden');
+            const output = document.getElementById('outputContent');
+            output.textContent = JSON.stringify(data, null, 2);
+
+            const statusMsg = document.getElementById('statusMessage');
+            statusMsg.classList.remove('hidden', 'error-message', 'success-message');
+            if (status === 'success') {
+                statusMsg.classList.add('success-message');
+                statusMsg.textContent = '✓ Workflow executed successfully';
+            } else {
+                statusMsg.classList.add('error-message');
+                statusMsg.textContent = '✗ Workflow execution failed';
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('workflowOutput').classList.remove('hidden');
+            const statusMsg = document.getElementById('statusMessage');
+            statusMsg.classList.remove('hidden', 'error-message', 'success-message');
+            statusMsg.classList.add('error-message');
+            statusMsg.textContent = `✗ ${message}`;
+        }
+
+        function clearOutput() {
+            document.getElementById('workflowOutput').classList.add('hidden');
+            document.getElementById('statusMessage').classList.add('hidden');
+            document.getElementById('outputContent').textContent = '';
+        }
+
+        function addToHistory(workflow, status, result) {
+            const timestamp = new Date().toLocaleTimeString();
+            const statusClass = status === 'completed' ? 'status-success' : status === 'failed' ? 'status-error' : 'status-pending';
+            const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+            
+            const historyItem = document.createElement('div');
+            historyItem.style.padding = 'var(--space-12)';
+            historyItem.style.borderBottom = '1px solid rgba(94, 82, 64, 0.15)';
+            historyItem.style.fontSize = '13px';
+            historyItem.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                    <strong>${workflow}</strong>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div style="color: var(--color-text-secondary);">${timestamp}</div>
+            `;
+            
+            const history = document.getElementById('executionHistory');
+            if (history.textContent.includes('No workflows')) {
+                history.innerHTML = '';
+            }
+            history.insertBefore(historyItem, history.firstChild);
+            
+            if (history.children.length > 10) {
+                history.removeChild(history.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>
